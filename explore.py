@@ -92,3 +92,18 @@ for candidate in candidates:
     industry_counter[industry] += 1
 print("Industry distribution:", industry_counter.most_common(10))
 
+
+
+industry_counter = Counter()
+for candidate in candidates:
+    for job in candidate["career_history"]:
+        industry_counter[job["industry"]] += 1
+print(industry_counter.most_common(20))
+
+
+for candidate in candidates[:10]:
+    for job in candidate["career_history"]:
+        print(job["company"], "→", job["industry"])
+
+
+
