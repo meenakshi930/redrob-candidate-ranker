@@ -140,7 +140,7 @@ if __name__ == "__main__":
         score = score_candidate(candidate)
         results.append((score, candidate["candidate_id"], candidate))
         
-    results.sort(key=lambda x: (-x[0], x[1]))
+    results.sort(key=lambda x: (-round(x[0], 4), x[1]))
     
     print("\nTop 10 candidates:")
     for score, cid, c in results[:10]:
