@@ -1,2 +1,4 @@
 candidates.jsonl.gz
 candidates.jsonl
+__pycache__/
+*.pyc
