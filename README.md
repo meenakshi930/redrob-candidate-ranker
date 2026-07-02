@@ -1,6 +1,33 @@
+---
+title: Redrob Ranker
+emoji: 🚀
+colorFrom: red
+colorTo: red
+sdk: docker
+app_port: 8501
+tags:
+  - streamlit
+pinned: false
+short_description: Candidate ranking system for Redrob assignment
+---
+
 # Redrob Candidate Ranker
 
-A Python-based candidate ranking system that evaluates job applicants based on their technical skills, work experience, career history, and recruiter signals. The project generates a ranked list of candidates for a given job description and exports the results as a submission CSV.
+A Python-based candidate ranking system developed for the Redrob Candidate Ranking Challenge. The application evaluates candidates based on their skills, experience, career history, recruiter signals, and profile quality, then ranks them according to a custom scoring algorithm.
+
+---
+
+## Features
+
+- Candidate ranking using a weighted scoring algorithm
+- Skill matching against job requirements
+- Experience-based scoring
+- Product company experience detection
+- Recruiter signal analysis
+- Honeypot profile detection
+- Dataset exploration utilities
+- Streamlit web interface for uploading and ranking candidates
+- CSV export of ranked candidates
 
 ---
 
@@ -9,81 +36,53 @@ A Python-based candidate ranking system that evaluates job applicants based on t
 ```
 redrob-candidate-ranker/
 │
-├── data/
-│   └── sample_candidates.json
-│
-├── explore.py                 # Dataset exploration and analysis
-├── rank.py                    # Candidate scoring and ranking
+├── app.py                     # Streamlit web application
+├── rank.py                    # Candidate scoring logic
+├── explore.py                 # Dataset exploration
 ├── honeypot.py                # Honeypot profile detection
-├── validate_submission.py     # Submission validator
-├── submission.csv             # Generated ranked candidates
+├── validate_submission.py     # Submission validation
 ├── requirements.txt
-└── README.md
+├── submission.csv
+├── submission_metadata.yaml
+├── README.md
+│
+└── data/
+    └── sample_candidates.json
 ```
 
 ---
 
-## Features
+## Scoring Criteria
 
-- Exploratory Data Analysis (EDA) on candidate dataset
-- Technical vs Non-Technical title classification
-- Product company experience detection
-- Skill matching with Job Description
-- Behavioral score adjustment using recruiter signals
-- Honeypot profile filtering
-- Final candidate ranking
-- CSV submission generation
+Each candidate is evaluated using multiple factors.
 
----
+### 1. Skill Score
 
-## Scoring Strategy
+Candidates receive points based on how well their technical skills match the required skills.
 
-The final score is calculated using multiple factors.
+Examples include:
 
-### 1. Career Score
+- Python
+- NLP
+- Embeddings
+- Retrieval
+- Vector Databases
+- Ranking
+- Fine-tuning
+- Evaluation
 
-Candidates receive additional points for:
+Skill confidence is also influenced by:
 
-- Product company experience
-- Relevant industries
-- Penalized if entire career is in IT Services/Consulting
-
-Example:
-
-- Product company experience → +10
-- Entire consulting career → -8
-
----
-
-### 2. Skill Score
-
-The project matches candidate skills against required Job Description skills.
-
-Current weighted skills include:
-
-| Skill | Weight |
-|--------|-------:|
-| Embeddings | 10 |
-| Vector Databases | 10 |
-| Retrieval | 10 |
-| Ranking | 9.5 |
-| NLP | 8 |
-| Fine Tuning | 7 |
-| Evaluation | 6 |
-| Python | 6 |
-
-Trust score is calculated using:
-
-- Skill assessment score
+- Assessment scores
 - Endorsements
-- Duration of experience
-- Proficiency level
+- Years of experience
+- Skill proficiency
 
 ---
 
-### 3. Experience Score
+### 2. Experience Score
 
-Candidates with ideal experience receive bonus points.
+Additional points are awarded based on relevant years of experience.
 
 | Experience | Score |
 |------------|------:|
@@ -93,25 +92,29 @@ Candidates with ideal experience receive bonus points.
 
 ---
 
+### 3. Career Score
+
+Candidates receive bonuses for:
+
+- Product company experience
+- Relevant industry background
+
+Penalties may be applied for:
+
+- Entire career in IT services/consulting
+- Less relevant experience
+
+---
+
 ### 4. Behavioral Multiplier
 
-The final score is adjusted using recruiter signals.
-
-Factors include:
+The final score is adjusted using recruiter signals such as:
 
 - Open to work
-- Recruiter response rate
 - Notice period
+- Recruiter response rate
 - GitHub activity
 - Last active date
-
-Example adjustments:
-
-- Open to work → ×1.10
-- Notice ≤30 days → ×1.10
-- High GitHub activity → ×1.15
-- Inactive profile → penalty
-- Low recruiter response rate → penalty
 
 ---
 
@@ -119,11 +122,7 @@ Example adjustments:
 
 Suspicious or fake profiles are detected using `honeypot.py`.
 
-If a candidate is identified as a honeypot:
-
-```
-Final Score = 0
-```
+Detected honeypot profiles receive a score of **0**.
 
 ---
 
@@ -132,8 +131,8 @@ Final Score = 0
 ```
 Final Score =
 (Career Score
- + Skill Score
- + Experience Score)
++ Skill Score
++ Experience Score)
 × Behavioral Multiplier
 ```
 
@@ -141,24 +140,22 @@ Final Score =
 
 ## Dataset Exploration
 
-`explore.py` provides useful insights including:
+The `explore.py` script provides useful statistics such as:
 
-- Country distribution
-- Candidates from India
-- Open-to-work statistics
+- Candidate distribution by country
 - Experience distribution
+- Open-to-work statistics
 - GitHub activity
-- Most common job titles
-- Skill assessment availability
-- Notice period distribution
-- Recently active candidates
 - Industry distribution
+- Most common job titles
+- Recently active candidates
+- Skill assessment coverage
 
 ---
 
-## Requirements
+## Installation
 
-Install dependencies:
+Clone the repository and install dependencies.
 
 ```bash
 pip install -r requirements.txt
@@ -168,55 +165,71 @@ pip install -r requirements.txt
 
 ## Running the Project
 
-### Explore Dataset
+### Run the Streamlit App
+
+```bash
+streamlit run app.py
+```
+
+Upload a JSON or JSONL file, and the application will display the ranked candidates.
+
+---
+
+### Explore the Dataset
 
 ```bash
 python explore.py
 ```
 
-## How to Reproduce
+---
+
+### Generate Rankings
 
 ```bash
 python rank.py
 ```
 
-This will:
-1. Load `candidates.jsonl` from the project directory
-2. Score all 100,000 candidates
-3. Generate `submission.csv` with top 100 ranked candidates
+This script:
+
+- Loads candidate data
+- Computes scores
+- Ranks candidates
+- Generates `submission.csv`
+
 ---
 
-## Output Format
+## Output
 
-The generated CSV contains:
+The generated `submission.csv` contains:
 
 | Column | Description |
 |---------|-------------|
-| candidate_id | Unique candidate ID |
-| rank | Candidate rank |
-| score | Final computed score |
-| reasoning | Short explanation for ranking |
+| candidate_id | Candidate identifier |
+| rank | Candidate ranking |
+| score | Final calculated score |
+| reasoning | Explanation for the assigned score |
 
 ---
 
 ## Technologies Used
 
-- Python 3
+- Python
+- Streamlit
 - JSON
 - CSV
-- Collections (Counter)
+- Collections
 - Datetime
 
 ---
 
 ## Future Improvements
 
-- Machine Learning based ranking
 - Semantic skill matching using embeddings
+- LLM-based candidate reasoning
 - Resume parsing
 - Configurable scoring weights
-- Streamlit dashboard
-- LLM-powered reasoning for ranking
+- Interactive analytics dashboard
+- Machine learning-based ranking model
 
 ---
 
@@ -224,6 +237,6 @@ The generated CSV contains:
 
 **Meenakshi Gupta**
 
-B.Tech CSE (AI & ML)
+B.Tech Computer Science (AI & ML)
 
-Candidate Ranking System for Redrob Assignment
+Developed as part of the **Redrob Candidate Ranking Challenge**.
