@@ -1,4 +1,5 @@
 import json
+from honeypot import is_honeypot
 from datetime import datetime
 with open("data/sample_candidates.json","r",encoding="utf-8") as file:
     candidates = json.load(file)
@@ -142,6 +143,8 @@ def get_behavioral_multiplier(candidate):
     return multiplier
     
 def score_candidate(candidate):
+    if is_honeypot(candidate):
+        return 0
     title=candidate["profile"]["current_title"]
     if classify_title(title)=="Non-Tech":
         return 0
